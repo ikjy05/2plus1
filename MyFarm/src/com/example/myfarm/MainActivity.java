@@ -34,9 +34,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private final static String TAG = "ODROID";
 
-	
-	//test/
-	
 	/*** 블루투스 송/수신 메시지 정의 ***/
 	// Message types sent from the BluetoothChatService Handler
 	public static final int MESSAGE_STATE_CHANGE = 1;
@@ -192,7 +189,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	// 텍스트뷰 이미지 정의
 	static final int[] TEXTVIEW = { R.id.textView1, R.id.textView2,
-			R.id.textView3, R.id.textView4, R.id.textView5, R.id.textView6 };
+			R.id.textView4, R.id.textView5 };
 	private TextView tv_temp, tv_lux, tv_hum;
 
 	// 리니어 레이아웃 정의
@@ -338,7 +335,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			TextView tv = (TextView) findViewById(tvId);
 			// 외부 폰트 적용
 			tv.setTypeface(Typeface.createFromAsset(getAssets(), "DS-DIGI.TTF"));
-			tv.setTextSize(35); // 글씨 크기 적용
+			tv.setTextSize(30); // 글씨 크기 적용
 		}
 
 		// 정의된 레이아웃을 객체로 변환 및 버튼 이벤트
@@ -352,14 +349,13 @@ public class MainActivity extends Activity implements OnClickListener {
 		// 정의된 텍스트뷰를 객체로 변환
 		tv_temp = (TextView) findViewById(R.id.tv_temp);
 		tv_lux = (TextView) findViewById(R.id.tv_lux);
-		tv_hum = (TextView) findViewById(R.id.tv_hum);
 		key_tv = (TextView) findViewById(R.id.textView_key);
 		smog_tv = (TextView) findViewById(R.id.textView_smog);
 
-		/*** 습도 출력 ****************************/
-		tv_hum.setTypeface(Typeface.createFromAsset(getAssets(), "DS-DIGI.TTF")); // 외부폰트적용
-		tv_hum.setTextSize(60); // 글자크기 적용
-		tv_hum.setText("30"); // 습도값 출력
+//		/*** 습도 출력 ****************************/
+//		tv_hum.setTypeface(Typeface.createFromAsset(getAssets(), "DS-DIGI.TTF")); // 외부폰트적용
+//		tv_hum.setTextSize(60); // 글자크기 적용
+//		tv_hum.setText("30"); // 습도값 출력
 
 		// 개폐기 수동모드를 위한 토글버튼 이벤트
 		togbtnWindowsOpener.setOnClickListener(new OnClickListener() {
@@ -1425,7 +1421,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private void updateKeyState(boolean on) {
 		if (on) {
 			key_tv.setText("접근이 감지되었습니다.");
-			key_tv.setBackgroundColor(Color.RED);
+//			key_tv.setBackgroundColor(Color.RED);
 			key_tv.setTextColor(Color.WHITE);
 
 			// 자동문 OPEN을 위한 패킷을 정의
@@ -1439,7 +1435,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		} else {
 			key_tv.setText("안전합니다.");
-			key_tv.setBackgroundColor(Color.YELLOW);
+//			key_tv.setBackgroundColor(Color.YELLOW);
 			key_tv.setTextColor(Color.BLACK);
 
 			// 자동문 CLOSE를 위한 패킷을 정의
@@ -1457,7 +1453,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private void updateSmogState(boolean on) {
 		if (on) {
 			smog_tv.setText("연기가 감지되었습니다.");
-			smog_tv.setBackgroundColor(Color.RED);
+//			smog_tv.setBackgroundColor(Color.RED);
 			smog_tv.setTextColor(Color.WHITE);
 
 			sprinkler_flag = true;
@@ -1465,7 +1461,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		} else {
 			smog_tv.setText("연기가 감지되지 않았습니다.");
-			smog_tv.setBackgroundColor(Color.YELLOW);
+//			smog_tv.setBackgroundColor(Color.YELLOW);
 			smog_tv.setTextColor(Color.BLACK);
 
 			sprinkler_flag = false;
