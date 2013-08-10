@@ -34,6 +34,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private final static String TAG = "ODROID";
 
+	
+	//test/
+	
 	/*** 블루투스 송/수신 메시지 정의 ***/
 	// Message types sent from the BluetoothChatService Handler
 	public static final int MESSAGE_STATE_CHANGE = 1;
