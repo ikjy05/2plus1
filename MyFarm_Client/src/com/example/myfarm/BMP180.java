@@ -1,7 +1,5 @@
 package com.example.myfarm;
 
-import android.util.Log;
-
 public class BMP180 {
 	private byte mRegisterAddr = (byte) 0xaa;
 	private short AC1;
@@ -87,9 +85,9 @@ public class BMP180 {
         x1 = (AC3 * b6) >> 13; 
         x2 = (B1 * ((b6 * b6) >> 12)) >> 16; 
         x3 = (x1 + x2 + 2) >> 2;
-        b4 = (AC4 * (long)(x3 + 32768)) >> 15; 
+        b4 = (AC4 * (x3 + 32768)) >> 15; 
 
-        b7 = ((long)UP - b3) * 50000;
+        b7 = (UP - b3) * 50000;
         p = ((b7 < 0x80000000) ? ((b7 << 1) / b4) : ((b7 / b4) * 2));
 
         x1 = p >> 8;

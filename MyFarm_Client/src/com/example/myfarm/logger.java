@@ -10,6 +10,7 @@ class ps implements Runnable{
 		this.t = t;
 		this.s = s;
 	}
+	@Override
 	public void run(){
 		t.setText(s);
 	}

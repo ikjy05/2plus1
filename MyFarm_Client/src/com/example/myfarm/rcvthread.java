@@ -3,8 +3,6 @@ package com.example.myfarm;
 import java.io.IOException;
 import java.net.Socket;
 
-import android.util.Log;
-
 public class rcvthread implements Runnable {
 
 	private logger logger;
@@ -35,6 +33,7 @@ public class rcvthread implements Runnable {
 		flag = setflag;
 	}
 
+	@Override
 	public void run() {
 		while (flag == 1) {
 			try {

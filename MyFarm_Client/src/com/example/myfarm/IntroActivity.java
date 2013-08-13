@@ -15,21 +15,23 @@ public class IntroActivity extends Activity {
 		setContentView(R.layout.activity_intro);
 		
 		h = new Handler();
-		h.postDelayed(irun, 1000); // 4ÃÊ µ¿¾È ÀÎÆ®·Î È­¸é
+		h.postDelayed(irun, 1000); // 4ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ®ï¿½ï¿½ È­ï¿½ï¿½
 	}
 	
 	Runnable irun = new Runnable(){
+		@Override
 		public void run(){
 			Intent i = new Intent(IntroActivity.this, MainActivity.class);
 			startActivity(i);
 			finish();
 			
-			//fade in À¸·Î ½ÃÀÛÇÏ¿© fade out À¸·Î ÀÎÆ®·Î È­¸éÀÌ ²¨Áö´Â ¾Ö´Ï¸ÞÀÌ¼Ç Ãß°¡ 
+			//fade in ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ fade out ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ®ï¿½ï¿½ È­ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ß°ï¿½ 
 		
 			overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 		}
 	};
 
+	@Override
 	public void onBackPressed(){
 		super.onBackPressed();
 		h.removeCallbacks(irun);

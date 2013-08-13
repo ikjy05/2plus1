@@ -5,8 +5,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -14,20 +12,10 @@ import android.app.*;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.*;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.*;
 import android.preference.PreferenceManager;
-import android.speech.RecognizerIntent;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.*;
 import android.view.View.OnClickListener;
@@ -146,6 +134,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	class RefreshTask extends TimerTask {
 		private int count = 0;
 
+		@Override
 		public void run() {
 			mTimerHandler.sendEmptyMessage(count);
 			count++;
@@ -447,6 +436,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		// 개폐기 수동모드를 위한 토글버튼 이벤트
 		togbtnWindowsOpener.setOnClickListener(new OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				// Perform action on clicks
 				if (togbtnWindowsOpener.isChecked()) {
@@ -494,6 +484,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		// 스프링쿨러 수동모드를 위한 토글버튼 이벤트
 		togbtnSprinkler.setOnClickListener(new OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				// Perform action on clicks
 				if (togbtnSprinkler.isChecked()) {
@@ -628,6 +619,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	// 클릭 이벤트 발생 시 처리 함수
+	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.cctv: // cctv 버튼 클릭 시 Cctv 액티비티로 이동
@@ -1292,10 +1284,10 @@ public class MainActivity extends Activity implements OnClickListener {
 
 				case RECEIVED_LETTER_FIRMWARE_VERSION: {
 					value = (short) (readBuf[1] << 8);
-					value |= (short) readBuf[2];
+					value |= readBuf[2];
 					short major = value;
 					value = (short) (readBuf[3] << 8);
-					value |= (short) readBuf[4];
+					value |= readBuf[4];
 					short minior = value;
 					// updateVersion(major, minior);
 				}
@@ -1309,8 +1301,8 @@ public class MainActivity extends Activity implements OnClickListener {
 					} else if (readBuf[1] == RECEIVED_LETTER_BMP180) {
 						getCalibrationData(mPressureSensor.getRegisterAddress());
 					} else if (readBuf[1] == RECEIVED_LETTER_LUX) {
-						lux = (int) (readBuf[2] << 8) & 0x0000ff00;
-						lux |= (int) (readBuf[3] & 0x000000ff);
+						lux = readBuf[2] << 8 & 0x0000ff00;
+						lux |= readBuf[3] & 0x000000ff;
 						// updateLux(lux);
 					} else if (readBuf[1] == RECEIVED_LETTER_TEMPERATURE) {
 						ByteBuffer bb = ByteBuffer.allocate(4);
@@ -1742,6 +1734,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		// Log.e(TAG, "stop");
 	}
 
+	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 		case REQUEST_CONNECT_DEVICE:
