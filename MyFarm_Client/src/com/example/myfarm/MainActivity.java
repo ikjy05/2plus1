@@ -407,7 +407,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			TextView tv = (TextView) findViewById(tvId);
 			// 외부 폰트 적용
 			tv.setTypeface(Typeface.createFromAsset(getAssets(), "DS-DIGI.TTF"));
-			tv.setTextSize(30); // 글씨 크기 적용
+			tv.setTextSize(25); // 글씨 크기 적용
 		}
 
 		// 정의된 레이아웃을 객체로 변환 및 버튼 이벤트

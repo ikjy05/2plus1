@@ -117,13 +117,13 @@ public final class R {
     }
     public static final class id {
         public static final int LinearLayout01=0x7f090008;
-        public static final int action_settings=0x7f09002b;
+        public static final int action_settings=0x7f090027;
         public static final int battery=0x7f09001b;
         public static final int btn_save=0x7f090007;
         public static final int buttonClose=0x7f090021;
         public static final int buttonConnect=0x7f09001d;
         public static final int buttonSend=0x7f09001f;
-        public static final int button_scan=0x7f09002a;
+        public static final int button_scan=0x7f090026;
         public static final int cctv=0x7f09001a;
         public static final int editText5=0x7f090005;
         public static final int editText6=0x7f090006;
@@ -133,16 +133,12 @@ public final class R {
         public static final int edit_low_lux=0x7f090003;
         public static final int edit_low_temp=0x7f090001;
         public static final int fan=0x7f090015;
-        public static final int fireView1=0x7f090022;
-        public static final int firesensor=0x7f090023;
         public static final int heater=0x7f090016;
         public static final int imageView=0x7f090009;
-        public static final int invadeView1=0x7f090024;
-        public static final int invadesensor=0x7f090025;
         public static final int layout_board=0x7f09000b;
         public static final int lux=0x7f090014;
-        public static final int new_devices=0x7f090029;
-        public static final int paired_devices=0x7f090027;
+        public static final int new_devices=0x7f090025;
+        public static final int paired_devices=0x7f090023;
         public static final int pbar_adk=0x7f090000;
         public static final int setting=0x7f09001c;
         public static final int sprinkler=0x7f090013;
@@ -153,8 +149,8 @@ public final class R {
         public static final int textViewStatus=0x7f090020;
         public static final int textView_key=0x7f090017;
         public static final int textView_smog=0x7f090018;
-        public static final int title_new_devices=0x7f090028;
-        public static final int title_paired_devices=0x7f090026;
+        public static final int title_new_devices=0x7f090024;
+        public static final int title_paired_devices=0x7f090022;
         public static final int tv_lux=0x7f09000f;
         public static final int tv_temp=0x7f09000e;
         public static final int weatherView1=0x7f090019;

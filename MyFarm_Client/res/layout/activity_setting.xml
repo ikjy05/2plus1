@@ -3,88 +3,65 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
+    <Button
+        android:id="@+id/buttonConnect"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        android:layout_weight="1"
+        android:text="Connect" />
+
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/editTextIPAddress"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:ems="10"
+            android:gravity="center_vertical|center_horizontal"
+            android:inputType="text" >
+
+            <requestFocus />
+        </EditText>
+
+        <Button
+            android:id="@+id/buttonSend"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:text="Send" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:orientation="horizontal" >
 
         <TextView
-            android:id="@+id/fireView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="60dp"
-            android:text="화재 센서"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="30px" />
-
-        <ToggleButton
-            android:id="@+id/firesensor"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:layout_marginLeft="60dp"
-            android:layout_marginTop="60dp"
-            android:background="@drawable/control_selector3"
-            android:textOff=""
-            android:textOn="" />
-
-    </LinearLayout>
-    
-	<LinearLayout
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/invadeView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="40dp"
-            android:text="침입 센서"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="30px" />
-
-        <ToggleButton
-            android:id="@+id/invadesensor"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:layout_marginLeft="60dp"
-            android:layout_marginTop="40dp"
-            android:background="@drawable/control_selector3"
-            android:textOff=""
-            android:textOn="" />
-        
-
-    </LinearLayout>
-    
-	<LinearLayout 
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:orientation="horizontal">
-        
-	    <TextView
-            android:id="@+id/invadeView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginTop="40dp"
-            android:text="Bluetooth\n장치 인식"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="30px" />
+            android:id="@+id/textViewStatus"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:textSize="20sp" />
 
         <Button
-            android:id="@+id/invadesensor"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:layout_marginLeft="85dp"
-            android:layout_marginTop="50dp"
-            android:background="@drawable/control_selector4"
-             />
-	    
-	</LinearLayout>
-	
-    
-	
+            android:id="@+id/buttonClose"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:text="Close" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:orientation="horizontal" />
 
 </LinearLayout>
