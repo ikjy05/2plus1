@@ -1644,8 +1644,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	private void updateKeyState(boolean on) {
 		if (on) {
 			key_tv.setText("접근이 감지되었습니다.");
-			// key_tv.setBackgroundColor(Color.RED);
-			key_tv.setTextColor(Color.RED);
+			key_tv.setBackgroundColor(Color.RED);
+			key_tv.setTextColor(Color.BLACK);
 
 			// 자동문 OPEN을 위한 패킷을 정의
 			commandPacket[0] = 'm';
@@ -1676,8 +1676,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	private void updateSmogState(boolean on) {
 		if (on) {
 			smog_tv.setText("연기가 감지되었습니다.");
-			// smog_tv.setBackgroundColor(Color.RED);
-			smog_tv.setTextColor(Color.RED);
+			smog_tv.setBackgroundColor(Color.RED);
+			smog_tv.setTextColor(Color.BLACK);
 
 			sprinkler_flag = true;
 			windowsopener_flag = true;

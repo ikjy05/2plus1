@@ -168,7 +168,7 @@
             android:layout_marginRight="3dp"
             android:layout_marginTop="3dp"
             android:layout_weight="0.3"
-            android:background="#c9ffa2"
+            android:background="#a5ef3a"
             android:gravity="center" />
 
         <TextView
@@ -178,7 +178,7 @@
             android:layout_marginRight="3dp"
             android:layout_marginTop="3dp"
             android:layout_weight="0.3"
-            android:background="#a2ffea"
+            android:background="#a5ef3a"
             android:gravity="center" />
     </LinearLayout>
 
@@ -230,7 +230,7 @@
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
             android:layout_marginTop="3dp"
-            android:background="@drawable/gear" />
+            android:background="@drawable/bluetooth" />
     </LinearLayout>
 
 </LinearLayout>

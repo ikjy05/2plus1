@@ -79,7 +79,7 @@
             android:layout_height="32dp"
             android:layout_marginLeft="85dp"
             android:layout_marginTop="50dp"
-            android:background="@drawable/control_selector4"
+            android:background="@drawable/bluetooth"
              />
 	    
 	</LinearLayout>
