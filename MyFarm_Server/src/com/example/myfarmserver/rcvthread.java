@@ -56,20 +56,8 @@ public class rcvthread implements Runnable {
 				String temp_str = "T";
 				temp_str += Long.toString(MainActivity.temperature);
 
-				outs.write(temp_str.getBytes());
-
-				/******* 연기감지 신호 송신 ******/
-				String smog_str = "R";
-
-				if (MainActivity.inputSMOG_flag)
-					smog_str += "1";
-
-				else
-					smog_str += "0";
-
-				outs.write(smog_str.getBytes());
-
-				/*********************/
+				outs.write(temp_str.getBytes("UTF-8"));
+				outs.flush();
 
 				/******* 접근감지 신호 송신 ******/
 				String prox_str = "G";
@@ -80,7 +68,22 @@ public class rcvthread implements Runnable {
 				else
 					prox_str += "0";
 
-				outs.write(prox_str.getBytes());
+				outs.write(prox_str.getBytes("UTF-8"));
+				outs.flush();
+
+				/*********************/
+
+				/******* 연기감지 신호 송신 ******/
+				String smog_str = "R";
+
+				if (MainActivity.inputSMOG_flag)
+					smog_str += "1";
+
+				else
+					smog_str += "0";
+
+				outs.write(smog_str.getBytes("UTF-8"));
+				outs.flush();
 
 				/*********************/
 
@@ -88,9 +91,11 @@ public class rcvthread implements Runnable {
 				String lux_str = "L";
 				lux_str += MainActivity.lux;
 
-				outs.write(lux_str.getBytes());
+				outs.write(lux_str.getBytes("UTF-8"));
+				outs.flush();
 
 				/*********************/
+
 				Message message = handler.obtainMessage(1, rcvData); // mstrdata는
 																		// 받은
 																		// 데이터

@@ -12,7 +12,6 @@ import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
 import android.app.*;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -332,8 +331,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_main);
 		/*********************************************/
 
-//		tv_soc = (TextView) findViewById(R.id.tv_soc);
-//		tv_soc.setText(tryGetIpAddress());
+		// tv_soc = (TextView) findViewById(R.id.tv_soc);
+		// tv_soc.setText(tryGetIpAddress());
 
 		handler = new Handler() {
 
@@ -343,7 +342,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				super.handleMessage(msg);
 				// tv.setText(msg.obj.toString());
 				if (msg.what == 1) {
-//					tv_soc.setText(msg.obj.toString());
+					// tv_soc.setText(msg.obj.toString());
 					recMessage = msg.obj.toString();
 
 					if (recMessage.equals("SN")) {
@@ -1658,7 +1657,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		} else {
 			key_tv.setText("안전합니다.");
-			// key_tv.setBackgroundColor(Color.YELLOW);
+			key_tv.setBackgroundColor(Color.rgb(165, 239, 58));
 			key_tv.setTextColor(Color.BLACK);
 
 			// 자동문 CLOSE를 위한 패킷을 정의
@@ -1684,7 +1683,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 		} else {
 			smog_tv.setText("연기가 감지되지 않았습니다.");
-			// smog_tv.setBackgroundColor(Color.YELLOW);
+			smog_tv.setBackgroundColor(Color.rgb(165, 239, 58));
 			smog_tv.setTextColor(Color.BLACK);
 
 			sprinkler_flag = false;
@@ -1926,7 +1925,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	static void printToTextView(String text) {
 
-//		tv_soc.setText(text);
+		// tv_soc.setText(text);
 	}
 
 	private static String tryGetIpAddress() {
@@ -1936,8 +1935,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				NetworkInterface intf = en.nextElement();
 				for (Enumeration<InetAddress> enumIpAddr = intf
 						.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-					InetAddress inetAddress = enumIpAddr
-							.nextElement();
+					InetAddress inetAddress = enumIpAddr.nextElement();
 					if (!inetAddress.isLoopbackAddress()) {
 
 						if (inetAddress instanceof Inet4Address) {
