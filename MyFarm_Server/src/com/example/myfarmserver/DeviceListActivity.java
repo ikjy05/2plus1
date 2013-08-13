@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.myfarm;
+package com.example.myfarmserver;
 
 import java.util.Set;
 

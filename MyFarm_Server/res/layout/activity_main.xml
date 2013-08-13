@@ -188,7 +188,7 @@
         android:layout_weight="1.5"
         android:orientation="horizontal" >
 
-        <com.example.myfarm.WeatherView
+        <com.example.myfarmserver.WeatherView
             android:id="@+id/weatherView1"
             android:layout_width="139dp"
             android:layout_height="fill_parent"

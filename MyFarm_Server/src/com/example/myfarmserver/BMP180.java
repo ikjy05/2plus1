@@ -1,4 +1,4 @@
-package com.example.myfarm;
+package com.example.myfarmserver;
 
 public class BMP180 {
 	private byte mRegisterAddr = (byte) 0xaa;

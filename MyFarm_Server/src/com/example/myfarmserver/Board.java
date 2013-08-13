@@ -1,4 +1,4 @@
-package com.example.myfarm;
+package com.example.myfarmserver;
 
 import android.os.Bundle;
 import android.app.Activity;

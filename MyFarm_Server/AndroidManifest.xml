@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.myfarm"
+    package="com.example.myfarmserver"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -30,7 +30,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.example.myfarm.IntroActivity"
+            android:name="com.example.myfarmserver.IntroActivity"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
             <intent-filter>
@@ -40,44 +40,44 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.myfarm.MainActivity"
+            android:name="com.example.myfarmserver.MainActivity"
             android:label="@string/title_activity_main" >
         </activity>
         <activity
-            android:name="com.example.myfarm.Cctv"
+            android:name="com.example.myfarmserver.Cctv"
             android:label="@string/title_activity_cctv" >
         </activity>
         <activity
-            android:name="com.example.myfarm.Temperature"
+            android:name="com.example.myfarmserver.Temperature"
             android:label="@string/title_activity_temperature" >
         </activity>
         <activity
-            android:name="com.example.myfarm.Humidity"
+            android:name="com.example.myfarmserver.Humidity"
             android:label="@string/title_activity_humidity" >
         </activity>
         <activity
-            android:name="com.example.myfarm.Solarpanel"
+            android:name="com.example.myfarmserver.Solarpanel"
             android:label="@string/title_activity_solarpanel" >
         </activity>
         <activity
-            android:name="com.example.myfarm.Fire"
+            android:name="com.example.myfarmserver.Fire"
             android:label="@string/title_activity_fire" >
         </activity>
         <activity
-            android:name="com.example.myfarm.DeviceListActivity"
+            android:name="com.example.myfarmserver.DeviceListActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/select_device"
             android:theme="@android:style/Theme.Dialog" />
         <activity
-            android:name="com.example.myfarm.Board"
+            android:name="com.example.myfarmserver.Board"
             android:label="@string/title_activity_board" >
         </activity>
         <activity
-            android:name="com.example.myfarm.Battery"
+            android:name="com.example.myfarmserver.Battery"
             android:label="@string/title_activity_battery" >
         </activity>
         <activity
-            android:name="com.example.myfarm.Setting"
+            android:name="com.example.myfarmserver.Setting"
             android:label="@string/title_activity_setting" >
         </activity>
     </application>

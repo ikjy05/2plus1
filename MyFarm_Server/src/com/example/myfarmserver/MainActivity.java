@@ -1,4 +1,4 @@
-package com.example.myfarm;
+package com.example.myfarmserver;
 
 import java.io.IOException;
 import java.net.Inet4Address;

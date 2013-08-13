@@ -1,4 +1,4 @@
-package com.example.myfarm;
+package com.example.myfarmserver;
 
 import java.util.*;
 

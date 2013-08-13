@@ -1,4 +1,4 @@
-package com.example.myfarm;
+package com.example.myfarmserver;
 /**
  * keti Jeong-youn 2013.07.28
  */
