@@ -250,7 +250,8 @@ public class BluetoothMotorControlService {
             mmSocket = tmp;
         }
 
-        public void run() {
+        @Override
+		public void run() {
             Log.i(TAG, "BEGIN mConnectThread");
             setName("ConnectThread");
 
@@ -320,7 +321,8 @@ public class BluetoothMotorControlService {
             mmOutStream = tmpOut;
         }
 
-        public void run() {
+        @Override
+		public void run() {
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
             int bytes;

@@ -226,6 +226,7 @@ public class WeatherView extends ImageView{
 		}
 
 		Handler handler=new Handler(){
+			@Override
 			public void handleMessage(Message msg){
 
 				//		skyText.setText(currentWeather);

@@ -8,7 +8,6 @@ import java.net.SocketAddress;
 
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 public class rcvthread implements Runnable {
 
@@ -24,6 +23,7 @@ public class rcvthread implements Runnable {
 		this.clientAddress = clientAddress;
 	}
 
+	@Override
 	public void run() {
 		try {
 			InputStream ins = clientSocket.getInputStream();

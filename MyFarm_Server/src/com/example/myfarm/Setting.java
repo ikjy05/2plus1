@@ -1,7 +1,5 @@
 package com.example.myfarm;
 
-import com.example.myfarm.MainActivity.*;
-
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.*;
@@ -21,6 +19,7 @@ public class Setting extends Activity {
 		
 		//화재 센서 리스너
 		tog_Firesensor.setOnClickListener(new OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				// Perform action on clicks
 				if (tog_Firesensor.isChecked()) {
@@ -40,6 +39,7 @@ public class Setting extends Activity {
 		
 		
 		tog_Invadesensor.setOnClickListener(new OnClickListener() {
+			@Override
 			public void onClick(View v) {
 				// Perform action on clicks
 				if (tog_Invadesensor.isChecked()) {

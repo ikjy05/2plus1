@@ -25,7 +25,8 @@ public class Cctv extends Activity {
 		
 		mTask = new TimerTask() {
           
-            public void run() {
+            @Override
+			public void run() {
             	if (wv != null) {
         			wv.loadUrl( "http://192.168.0.251:8080/?action=snapshot");
         		}
