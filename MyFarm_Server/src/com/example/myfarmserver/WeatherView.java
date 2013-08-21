@@ -31,6 +31,7 @@ public class WeatherView extends ImageView{
 	private LocationManager locationManager;
 	private Location location;
 	String mCountry;
+	String TAG = "WEATHER";
 
 	public WeatherView(Context context) {
 		super(context);
@@ -45,8 +46,8 @@ public class WeatherView extends ImageView{
 
 		this.context = context;
 
+//		mCountry = "Seoul";
 		checkMyLocation();
-		new WeatherThread().start();
 
 	}
 
@@ -58,7 +59,7 @@ public class WeatherView extends ImageView{
 	}
 
 	public void checkMyLocation(){
-		Log.i("fcall", "checkMyLocation");
+		Log.w("fcall", "checkMyLocation");
 		locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
 
 		Criteria criteria = new Criteria();
@@ -78,12 +79,12 @@ public class WeatherView extends ImageView{
 		location = locationManager.getLastKnownLocation(provider);
 
 		if(location == null){
-			try{
-				Thread.sleep(10000);
-			}catch(InterruptedException e){
-				e.printStackTrace();
-			}
-			location = locationManager.getLastKnownLocation(provider);    
+
+//			Locale systemLocale = context.getResources().getConfiguration().locale;
+//			mCountry = systemLocale.getCountry();
+			mCountry = "KOR";
+			Log.w(TAG, "Location check error, Default Setting : "+mCountry);
+
 		}
 		else {
 			try {
@@ -91,10 +92,10 @@ public class WeatherView extends ImageView{
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-
 			}
 
 		}
+		new WeatherThread().start();
 
 	}
 
@@ -119,7 +120,7 @@ public class WeatherView extends ImageView{
 						+mAddress.getSubLocality()+" "
 						+mAddress.getThoroughfare()+" "
 						+mAddress.getFeatureName();
-				Log.i("Address", mAddressStr);
+				Log.w("Address", mAddressStr);
 				mCountry = mAddress.getLocality();
 				//				Toast.makeText(getBaseContext(), mAddressStr, Toast.LENGTH_LONG).show();
 
@@ -129,8 +130,7 @@ public class WeatherView extends ImageView{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 
-			Locale systemLocale = context.getResources().getConfiguration().locale;
-			mCountry = systemLocale.getCountry();
+
 		}
 
 	}
@@ -145,7 +145,7 @@ public class WeatherView extends ImageView{
 				//검색할 도시 얻어오기
 				String city = mCountry;
 
-				Log.i("country", mCountry);
+				Log.w("country", mCountry);
 				//city가 한글이면 글자가 깨지지 않게 인코딩 설정
 				city=URLEncoder.encode(city,"UTF-8");
 				String surl="http://weather.service.msn.com/data.aspx?weadergreetype=C&culture=ko-KR&weasearchstr="
@@ -187,13 +187,13 @@ public class WeatherView extends ImageView{
 								if(attr!=null && attr.equals("temperature")){
 									//i번째 속성값 객체에 저장하기
 									//		         info.setHigh(parser.getAttributeValue(i));
-									Log.i("temperature", parser.getAttributeValue(i));
+									Log.w("temperature", parser.getAttributeValue(i));
 								}
 								if(attr!=null && attr.equals("observationpoint")){
 									//i번째 속성값 객체에 저장하기
 									//		         info.setLow(parser.getAttributeValue(i));
 									//									Toast.makeText(getBaseContext(), parser.getAttributeValue(i), Toast.LENGTH_LONG).show();
-									Log.i("point", parser.getAttributeValue(i));
+									Log.w("point", parser.getAttributeValue(i));
 
 								}
 								if(attr!=null && attr.equals("skytext")){
@@ -201,7 +201,7 @@ public class WeatherView extends ImageView{
 									//		         info.setSkytextday(parser.getAttributeValue(i));
 									//									skyText.setText(parser.getAttributeValue(i));
 									//								skyText.setText(currentWeather);
-									Log.i("skytext", parser.getAttributeValue(i));
+									Log.w("skytext", parser.getAttributeValue(i));
 								}
 							}
 
@@ -211,7 +211,7 @@ public class WeatherView extends ImageView{
 				}
 
 
-				Log.i("skycode", skyCode);
+				Log.w("skycode", skyCode);
 				Message msg=Message.obtain();
 				msg.what=0;
 				//		    msg.obj=list;

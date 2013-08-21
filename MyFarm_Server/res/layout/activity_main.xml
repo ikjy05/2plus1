@@ -33,6 +33,7 @@
                 android:id="@+id/textView2"
                 android:layout_width="fill_parent"
                 android:layout_height="0dp"
+                android:layout_marginLeft="3dp"
                 android:layout_weight="1"
                 android:background="#D0F7FE"
                 android:gravity="center"
@@ -68,7 +69,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="fill_parent"
-            android:layout_weight="0.5"
+            android:layout_weight="0.6"
             android:orientation="vertical" >
 
             <TextView
@@ -194,9 +195,9 @@
             android:layout_height="fill_parent"
             android:layout_marginLeft="3dp"
             android:layout_marginTop="3dp"
-            android:src="@drawable/weather" />
+            android:background="#6EDDDD" />
 
-        <Button
+        <!-- <Button
             android:id="@+id/cctv"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
@@ -204,7 +205,13 @@
             android:layout_marginRight="3dp"
             android:layout_marginTop="3dp"
             android:layout_weight="1.2"
-            android:background="@drawable/cctv" />
+            android:background="@drawable/cctv" /> -->
+
+        <com.example.myfarmserver.MjpegView
+            android:id="@+id/mv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+            
     </LinearLayout>
 
     <LinearLayout

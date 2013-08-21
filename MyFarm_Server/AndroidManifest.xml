@@ -41,7 +41,8 @@
         </activity>
         <activity
             android:name="com.example.myfarmserver.MainActivity"
-            android:label="@string/title_activity_main" >
+            android:label="@string/title_activity_main"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"  >
         </activity>
         <activity
             android:name="com.example.myfarmserver.Cctv"

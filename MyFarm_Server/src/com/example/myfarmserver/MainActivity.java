@@ -1,29 +1,54 @@
 package com.example.myfarmserver;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.app.*;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.*;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.os.*;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.*;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.*;
+import android.view.Window;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 public class MainActivity extends Activity implements OnClickListener {
 
@@ -34,9 +59,15 @@ public class MainActivity extends Activity implements OnClickListener {
 	static Handler handler;
 
 	public static String recMessage = "CMD";
+	public static String sndMessage = "CMD";
+	private String tempData = null;
+
+	public static boolean soc_flag;
 
 	/*******************************************/
-
+	MjpegView mv;
+	final static int BUFF_LEN = 4112;
+	
 	private final static String TAG = "ODROID";
 
 	/*** 블루투스 송/수신 메시지 정의 ***/
@@ -186,12 +217,15 @@ public class MainActivity extends Activity implements OnClickListener {
 	// Buttons menu
 	private final static int MENU_ITEM_CONNECT = Menu.FIRST;
 	private final static int MENU_ITEM_DISCONNECT = Menu.FIRST + 1;
-	private final static int MENU_ITEM_EXIT = Menu.FIRST + 7;
+	private final static int MENU_IP_ADDRESS = Menu.FIRST + 2;
+	private final static int MENU_ITEM_EXIT = Menu.FIRST + 3;
 
 	/*** 이미지 정의 ***/
 	// 버튼 이미지 정의
-	static final int[] BUTTONS = { R.id.cctv, R.id.battery, R.id.setting,
-			R.id.lux, R.id.fan, R.id.heater };
+//	static final int[] BUTTONS = { R.id.cctv, R.id.battery, R.id.setting,
+//			R.id.lux, R.id.fan, R.id.heater };
+	static final int[] BUTTONS = { R.id.battery, R.id.setting,
+		R.id.lux, R.id.fan, R.id.heater };
 
 	// 텍스트뷰 이미지 정의
 	static final int[] TEXTVIEW = { R.id.textView1, R.id.textView2,
@@ -231,6 +265,16 @@ public class MainActivity extends Activity implements OnClickListener {
 	// AlertDialog를 띄우기 위한 변수
 	private AlertDialog ad_lux, ad_fan, ad_heater;
 
+	// 화면 전환 출력 위한 int형 flag
+	private int sprinkler_int_flag = 0;
+	private int windowopener_int_flag = 0;
+	private int lux_int_flag = 0;
+	private int fan_int_flag = 0;
+	private int heater_int_flag = 0;
+
+	ToggleButton togbtnSprinkler;
+	ToggleButton togbtnWindowsOpener;
+
 	// 실시간 출력을 위한 핸들러
 	private Handler mmHandler = new Handler() {
 		@Override
@@ -251,8 +295,14 @@ public class MainActivity extends Activity implements OnClickListener {
 				int temp = Integer.valueOf(temp_str);
 				temp *= 0.1;
 
+				if (rcvthread.socRec_flag) {
+
+					set_low_temp = Integer.valueOf(rcvthread.rcvLowSetTemp);
+					set_high_temp = Integer.valueOf(rcvthread.rcvHighSetTemp);
+				}
 				// 설정 온도에 따른 제어 함수
 				updateTemp(temp, set_low_temp, set_high_temp);
+
 			}
 
 			/*** 조도 출력 ****************************/
@@ -263,6 +313,13 @@ public class MainActivity extends Activity implements OnClickListener {
 			tv_lux.setText("" + lux); // 조도값 출력
 
 			if (!controlLight_flag) { // 조도감지 시
+
+				if (rcvthread.socRec_flag) {
+
+					set_low_lux = Integer.valueOf(rcvthread.rcvLowSetLux);
+					set_high_lux = Integer.valueOf(rcvthread.rcvHighSetLux);
+				}
+
 				// 설정 조도에 따른 제어 함수
 				updateLux(lux, set_low_lux, set_high_lux);
 			}
@@ -320,30 +377,124 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			/***************************************/
 
+			Button lux = (Button) findViewById(R.id.lux);
+			Button fan = (Button) findViewById(R.id.fan);
+			Button heater = (Button) findViewById(R.id.heater);
+
+			switch (lux_int_flag) {
+			case 0:
+				lux.setBackgroundResource(R.drawable.lightoff);
+				break;
+			case 1:
+				lux.setBackgroundResource(R.drawable.light1);
+				break;
+			case 2:
+				lux.setBackgroundResource(R.drawable.light2);
+				break;
+			default:
+				break;
+			}
+
+			switch (fan_int_flag) {
+			case 0:
+				fan.setBackgroundResource(R.drawable.fanoff);
+				break;
+			case 1:
+				fan.setBackgroundResource(R.drawable.fan1);
+				break;
+			case 2:
+				fan.setBackgroundResource(R.drawable.fan2);
+				break;
+			default:
+				break;
+			}
+
+			switch (heater_int_flag) {
+			case 0:
+				heater.setBackgroundResource(R.drawable.heateroff);
+				break;
+			case 1:
+				heater.setBackgroundResource(R.drawable.heater1);
+				break;
+			case 2:
+				heater.setBackgroundResource(R.drawable.heater2);
+				break;
+			default:
+				break;
+			}
+
+			switch (sprinkler_int_flag) {
+			case 0:
+				togbtnSprinkler.setBackgroundResource(R.drawable.sprinkleroff);
+				break;
+			case 1:
+				togbtnSprinkler.setBackgroundResource(R.drawable.sprinkleron);
+				break;
+			default:
+				break;
+			}
+
+			switch (windowopener_int_flag) {
+			case 0:
+				togbtnWindowsOpener
+						.setBackgroundResource(R.drawable.windowsclose);
+				break;
+			case 1:
+				togbtnWindowsOpener
+						.setBackgroundResource(R.drawable.windowsopen);
+				break;
+			default:
+				break;
+			}
+
 			mmHandler.sendEmptyMessageDelayed(0, 500);
 		}
 	};
 
+	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_main);
+
+		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitNetwork().build()); 
+
+
+		try {
+			shellCommand("mjpg-streamer -i \"input_uvc.so -d /dev/video4\" -o \"output_http.so -p 9000\"\n");
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			Log.e("shell", "Camera On Failed");
+			Toast.makeText(this, "Camera on failed", Toast.LENGTH_SHORT).show();
+		}
+		//shellCommand("ls");
+
 		/*********************************************/
 
-		// tv_soc = (TextView) findViewById(R.id.tv_soc);
-		// tv_soc.setText(tryGetIpAddress());
-
+		
 		handler = new Handler() {
 
 			@Override
 			public void handleMessage(Message msg) {
 				// TODO Auto-generated method stub
 				super.handleMessage(msg);
-				// tv.setText(msg.obj.toString());
 				if (msg.what == 1) {
-					// tv_soc.setText(msg.obj.toString());
-					recMessage = msg.obj.toString();
+					tempData = msg.obj.toString();
+
+//					Log.e("****tempData", tempData);
+//					// tempData = rcvStrData;
+//
+//					if (tempData.equals(recMessage)) {
+//						recMessage = "X";
+//
+//					} else if (!tempData.equals(recMessage)) {
+//						Log.e("####recMessage", recMessage);
+						recMessage = tempData;
+//						Log.e("@@@@recMessage", recMessage);
+//						// 모든 데이터 삽입
+//					}
 
 					if (recMessage.equals("SN")) {
 						commandPacket[0] = 'm';
@@ -354,6 +505,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
 						mCmdSendService.write(commandPacket);
 
+						sprinkler_int_flag = 1;
+
 					} else if (recMessage.equals("SF")) {
 						commandPacket[0] = 'm';
 						commandPacket[1] = 0;
@@ -362,6 +515,8 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = 0;
 
 						mCmdSendService.write(commandPacket);
+
+						sprinkler_int_flag = 0;
 					} else if (recMessage.equals("OO")) {
 						commandPacket[0] = 'm';
 						commandPacket[1] = 0;
@@ -370,6 +525,8 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = 11;
 
 						mCmdSendService.write(commandPacket);
+						windowopener_int_flag = 1;
+
 					} else if (recMessage.equals("OF")) {
 						commandPacket[0] = 'm';
 						commandPacket[1] = 0;
@@ -378,6 +535,7 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = 0;
 
 						mCmdSendService.write(commandPacket);
+
 					} else if (recMessage.equals("OC")) {
 						commandPacket[0] = 'm';
 						commandPacket[1] = 0;
@@ -386,7 +544,9 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = 11;
 
 						mCmdSendService.write(commandPacket);
-					} else if (recMessage.equals("L1F")) {
+						windowopener_int_flag = 0;
+
+					} else if (recMessage.equals("L1FL2F")) {
 						// 조도 LED1 OFF를 위한 패킷을 정의
 						commandPacket[0] = 'o';
 						commandPacket[1] = 0;
@@ -395,7 +555,7 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = 0;
 
 						mCmdSendService.write(commandPacket); // 패킷 송신
-					} else if (recMessage.equals("L2F")) {
+
 						// 조도 LED2 OFF를 위한 패킷을 정의
 						commandPacket[0] = 'o';
 						commandPacket[1] = 0;
@@ -404,7 +564,10 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = 0;
 
 						mCmdSendService.write(commandPacket); // 패킷 송신
-					} else if (recMessage.equals("L1O")) {
+
+						lux_int_flag = 0; // 조도버튼을 OFF상태로
+
+					} else if (recMessage.equals("L1OL2O")) {
 						// 조도 LED1 ON를 위한 패킷을 정의
 						commandPacket[0] = 'o';
 						commandPacket[1] = 0;
@@ -413,7 +576,7 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = 1;
 
 						mCmdSendService.write(commandPacket); // 패킷 송신
-					} else if (recMessage.equals("L2O")) {
+
 						// 조도 LED2 OFF를 위한 패킷을 정의
 						commandPacket[0] = 'o';
 						commandPacket[1] = 0;
@@ -422,6 +585,30 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = 1;
 
 						mCmdSendService.write(commandPacket); // 패킷 송신
+
+						lux_int_flag = 2; // 조도버튼을 2단계 상태로
+
+					} else if (recMessage.equals("L1OL2F")) {
+						// 조도 LED1 ON를 위한 패킷을 정의
+						commandPacket[0] = 'o';
+						commandPacket[1] = 0;
+						commandPacket[2] = 2;
+						commandPacket[3] = 0;
+						commandPacket[4] = 1;
+
+						mCmdSendService.write(commandPacket);// 패킷 송신
+
+						// 조도 LED2 ON를 위한 패킷을 정의
+						commandPacket[0] = 'o';
+						commandPacket[1] = 0;
+						commandPacket[2] = 5;
+						commandPacket[3] = 0;
+						commandPacket[4] = 0;
+
+						mCmdSendService.write(commandPacket);// 패킷 송신
+
+						lux_int_flag = 1; // 조도버튼을 1단계 상태로
+
 					} else if (recMessage.equals("FF")) {
 						// 펜 OFF를 위한 패킷을 정의
 						commandPacket[0] = 'm';
@@ -431,6 +618,9 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = 0;
 
 						mCmdSendService.write(commandPacket);// 패킷 송신
+
+						fan_int_flag = 0; // 펜 버튼을 OFF 상태로
+
 					} else if (recMessage.equals("F1")) {
 						// 펜 LOW 출력을 위한 패킷을 정의
 						commandPacket[0] = 'm';
@@ -440,6 +630,8 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = (byte) 255;
 
 						mCmdSendService.write(commandPacket);// 패킷 송신
+
+						fan_int_flag = 1; // 펜 버튼을 1단계 상태로
 					} else if (recMessage.equals("F2")) {
 						// 펜 HIGH 출력을 위한 패킷을 정의
 						commandPacket[0] = 'm';
@@ -449,6 +641,8 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = (byte) 255;
 
 						mCmdSendService.write(commandPacket);// 패킷 송신
+
+						fan_int_flag = 2; // 펜 버튼을 2단계 상태로
 					} else if (recMessage.equals("HF")) {
 						// 히터 OFF를 위한 패킷을 정의
 						commandPacket[0] = 'm';
@@ -458,6 +652,8 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = 0;
 
 						mCmdSendService.write(commandPacket);// 패킷 송신
+
+						heater_int_flag = 0; // 히터 버튼을 OFF 상태로
 					}
 
 					else if (recMessage.equals("H1")) {
@@ -469,6 +665,9 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = (byte) 50;
 
 						mCmdSendService.write(commandPacket);// 패킷 송신
+
+						heater_int_flag = 1; // 히터 버튼을 1단계 상태로
+
 					} else if (recMessage.equals("H2")) {
 						// 히터 HIGH 출력을 위한 패킷을 정의
 						commandPacket[0] = 'm';
@@ -478,6 +677,9 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = (byte) 255;
 
 						mCmdSendService.write(commandPacket);// 패킷 송신
+
+						heater_int_flag = 2; // 히터 버튼을 2단계 상태로
+
 					} else if (recMessage.equals("DO")) {
 						// 자동문 OPEN을 위한 패킷을 정의
 						commandPacket[0] = 'm';
@@ -498,18 +700,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 						mCmdSendService.write(commandPacket); // 패킷 송신
 					}
-					// switch (recMessage) {
-					// case "SO":
-					// break;
-					// case "S1":
-					// break;
-					// default:
-					// break;
-					// }
 				}
-
-				// Log.d("handle msg", msg.obj.toString());
-
 			}
 		};
 
@@ -561,8 +752,8 @@ public class MainActivity extends Activity implements OnClickListener {
 		linear_board.setOnClickListener(this);
 
 		// 정의된 토글버튼을 객체로 변환
-		final ToggleButton togbtnWindowsOpener = (ToggleButton) findViewById(R.id.windowsopener);
-		final ToggleButton togbtnSprinkler = (ToggleButton) findViewById(R.id.sprinkler);
+		togbtnWindowsOpener = (ToggleButton) findViewById(R.id.windowsopener);
+		togbtnSprinkler = (ToggleButton) findViewById(R.id.sprinkler);
 
 		// 정의된 텍스트뷰를 객체로 변환
 		tv_temp = (TextView) findViewById(R.id.tv_temp);
@@ -593,7 +784,13 @@ public class MainActivity extends Activity implements OnClickListener {
 					commandPacket[4] = 11;
 
 					mCmdSendService.write(commandPacket); // 패킷 송신
+
+					// 클라이언트 메시지 송신(소켓)
+					sndMessage = "OO";
+
 					controlWindowsopener_flag = true; // 수동모드(우선순위)를 활성화
+
+					windowopener_int_flag = 1;
 
 					new DelayThread().start(); // 시간지연 시작
 
@@ -610,6 +807,11 @@ public class MainActivity extends Activity implements OnClickListener {
 
 					mCmdSendService.write(commandPacket); // 패킷 송신
 					controlWindowsopener_flag = false; // 수동모드(우선순위)를 비활성화
+
+					// 클라이언트 메시지 송신(소켓)
+					sndMessage = "OC";
+
+					windowopener_int_flag = 0;
 
 					new DelayThread().start(); // 시간지연 시작
 				}
@@ -633,7 +835,13 @@ public class MainActivity extends Activity implements OnClickListener {
 					commandPacket[4] = 11;
 
 					mCmdSendService.write(commandPacket); // 패킷 송신
+
+					// 클라이언트 메시지 송신(소켓)
+					sndMessage = "SN";
+
 					controlSprinkler_flag = true; // 수동모드(우선순위)를 활성화
+
+					sprinkler_int_flag = 1;
 
 				} else {
 					Toast.makeText(MainActivity.this, "스프링쿨러 OFF",
@@ -647,7 +855,13 @@ public class MainActivity extends Activity implements OnClickListener {
 					commandPacket[4] = 0;
 
 					mCmdSendService.write(commandPacket); // 패킷 송신
+
+					// 클라이언트 메시지 송신(소켓)
+					sndMessage = "SF";
+
 					controlSprinkler_flag = false; // 수동모드(우선순위)를 비활성화
+
+					sprinkler_int_flag = 0;
 				}
 			}
 		});
@@ -742,16 +956,21 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 
 		mmHandler.sendEmptyMessageDelayed(0, 500);
-	}
+		
+		///카메라
+		mv = (MjpegView) findViewById(R.id.mv);
+		String URL = "http://127.0.0.1:9000/?action=stream";
+		new DoRead().execute(URL);
+	} // OnCreate
 
 	// 클릭 이벤트 발생 시 처리 함수
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
-		case R.id.cctv: // cctv 버튼 클릭 시 Cctv 액티비티로 이동
-			Intent i00 = new Intent(this, Cctv.class);
-			startActivity(i00);
-			break;
+//		case R.id.cctv: // cctv 버튼 클릭 시 Cctv 액티비티로 이동
+//			Intent i00 = new Intent(this, Cctv.class);
+//			startActivity(i00);
+//			break;
 
 		case R.id.layout_board: // layout_board 버튼 클릭 시 Board 액티비티로 이동
 			Intent i01 = new Intent(this, Board.class);
@@ -764,8 +983,10 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 
 		case R.id.setting: // setting 버튼 클릭 시 Setting 액티비티로 이동
-			Intent i03 = new Intent(this, Setting.class);
-			startActivity(i03);
+			Intent serverIntent = new Intent(getApplicationContext(),
+					DeviceListActivity.class);
+			startActivityForResult(serverIntent,
+					MainActivity.REQUEST_CONNECT_DEVICE);
 			break;
 
 		case R.id.lux: // btn_lux 버튼 클릭 시
@@ -799,14 +1020,14 @@ public class MainActivity extends Activity implements OnClickListener {
 				.setMessage("조도값을 조절해 주세요")
 				.setPositiveButton("OFF",
 						new DialogInterface.OnClickListener() {
+
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
 
 								controlLight_flag = false; // 수동모드(우선순위)를 비활성화
 
-								Button lux = (Button) findViewById(R.id.lux);
-								lux.setBackgroundResource(R.drawable.lightoff);
+								lux_int_flag = 0; // 화면을 OFF상태로
 
 								Toast.makeText(MainActivity.this,
 										"조도 수동모드 OFF", Toast.LENGTH_SHORT)
@@ -829,6 +1050,8 @@ public class MainActivity extends Activity implements OnClickListener {
 								commandPacket[4] = 0;
 
 								mCmdSendService.write(commandPacket); // 패킷 송신
+								// 클라이언트 메시지 송신(소켓)
+								sndMessage = "L1FL2F";
 							}
 						})
 				.setNeutralButton("2단계", new DialogInterface.OnClickListener() {
@@ -837,8 +1060,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 						controlLight_flag = true; // 수동모드(우선순위)를 활성화
 
-						Button lux = (Button) findViewById(R.id.lux);
-						lux.setBackgroundResource(R.drawable.light2);
+						lux_int_flag = 2; // 화면을 2단계 상태로
 
 						Toast.makeText(MainActivity.this, "조도 수동모드 2단계",
 								Toast.LENGTH_SHORT).show();
@@ -860,6 +1082,8 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = 1;
 
 						mCmdSendService.write(commandPacket); // 패킷 송신
+						// 클라이언트 메시지 송신(소켓)
+						sndMessage = "L1OL2O";
 					}
 				})
 				.setNegativeButton("1단계",
@@ -869,8 +1093,9 @@ public class MainActivity extends Activity implements OnClickListener {
 									int which) {
 
 								controlLight_flag = true; // 수동모드(우선순위)를 활성화
-								Button lux = (Button) findViewById(R.id.lux);
-								lux.setBackgroundResource(R.drawable.light1);
+
+								lux_int_flag = 1; // 화면을 1단계 상태로
+
 								Toast.makeText(MainActivity.this,
 										"조도 수동모드 1단계", Toast.LENGTH_SHORT)
 										.show();
@@ -892,6 +1117,8 @@ public class MainActivity extends Activity implements OnClickListener {
 								commandPacket[4] = 0;
 
 								mCmdSendService.write(commandPacket);// 패킷 송신
+								// 클라이언트 메시지 송신(소켓)
+								sndMessage = "L1OL2F";
 
 							}
 						}).create();
@@ -908,8 +1135,8 @@ public class MainActivity extends Activity implements OnClickListener {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								Button lux = (Button) findViewById(R.id.fan);
-								lux.setBackgroundResource(R.drawable.fanoff);
+								fan_int_flag = 0;
+
 								Toast.makeText(MainActivity.this,
 										"FAN 수동모드 OFF", Toast.LENGTH_SHORT)
 										.show();
@@ -922,13 +1149,16 @@ public class MainActivity extends Activity implements OnClickListener {
 								commandPacket[4] = 0;
 
 								mCmdSendService.write(commandPacket);// 패킷 송신
+								// 클라이언트 메시지 송신(소켓)
+								sndMessage = "FF";
 							}
 						})
 				.setNeutralButton("2단계", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						Button lux = (Button) findViewById(R.id.fan);
-						lux.setBackgroundResource(R.drawable.fan2);
+
+						fan_int_flag = 2;
+
 						Toast.makeText(MainActivity.this, "FAN 수동모드 2단계",
 								Toast.LENGTH_SHORT).show();
 
@@ -940,6 +1170,9 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = (byte) 255;
 
 						mCmdSendService.write(commandPacket);// 패킷 송신
+
+						// 클라이언트 메시지 송신(소켓)
+						sndMessage = "F2";
 					}
 				})
 				.setNegativeButton("1단계",
@@ -947,8 +1180,9 @@ public class MainActivity extends Activity implements OnClickListener {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								Button lux = (Button) findViewById(R.id.fan);
-								lux.setBackgroundResource(R.drawable.fan1);
+
+								fan_int_flag = 1;
+
 								Toast.makeText(MainActivity.this,
 										"FAN 수동모드 1단계", Toast.LENGTH_SHORT)
 										.show();
@@ -962,8 +1196,16 @@ public class MainActivity extends Activity implements OnClickListener {
 
 								mCmdSendService.write(commandPacket);// 패킷 송신
 
+								// 클라이언트 메시지 송신(소켓)
+								sndMessage = "F1";
+
 							}
 						}).create();
+		
+		///카메라
+		mv = (MjpegView) findViewById(R.id.mv);
+		String URL = "http://127.0.0.1:9000/?action=stream";
+		new DoRead().execute(URL);
 	}
 
 	// 히터 수동모드를 위한 AlertDialog 함수
@@ -977,8 +1219,9 @@ public class MainActivity extends Activity implements OnClickListener {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								Button lux = (Button) findViewById(R.id.heater);
-								lux.setBackgroundResource(R.drawable.heateroff);
+
+								heater_int_flag = 0;
+
 								Toast.makeText(MainActivity.this,
 										"HEATER 수동모드 OFF", Toast.LENGTH_SHORT)
 										.show();
@@ -991,13 +1234,16 @@ public class MainActivity extends Activity implements OnClickListener {
 								commandPacket[4] = 0;
 
 								mCmdSendService.write(commandPacket);// 패킷 송신
+
+								// 클라이언트 메시지 송신(소켓)
+								sndMessage = "HF";
 							}
 						})
 				.setNeutralButton("2단계", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						Button lux = (Button) findViewById(R.id.heater);
-						lux.setBackgroundResource(R.drawable.heater2);
+						heater_int_flag = 2;
+
 						Toast.makeText(MainActivity.this, "HEATER 수동모드 2단계",
 								Toast.LENGTH_SHORT).show();
 
@@ -1009,6 +1255,9 @@ public class MainActivity extends Activity implements OnClickListener {
 						commandPacket[4] = (byte) 255;
 
 						mCmdSendService.write(commandPacket);// 패킷 송신
+
+						// 클라이언트 메시지 송신(소켓)
+						sndMessage = "H2";
 					}
 				})
 				.setNegativeButton("1단계",
@@ -1016,8 +1265,8 @@ public class MainActivity extends Activity implements OnClickListener {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								Button lux = (Button) findViewById(R.id.heater);
-								lux.setBackgroundResource(R.drawable.heater1);
+								heater_int_flag = 1;
+
 								Toast.makeText(MainActivity.this,
 										"HEATER 수동모드 1단계", Toast.LENGTH_SHORT)
 										.show();
@@ -1030,6 +1279,9 @@ public class MainActivity extends Activity implements OnClickListener {
 								commandPacket[4] = (byte) 50;
 
 								mCmdSendService.write(commandPacket);// 패킷 송신
+
+								// 클라이언트 메시지 송신(소켓)
+								sndMessage = "H1";
 
 							}
 						}).create();
@@ -1380,6 +1632,7 @@ public class MainActivity extends Activity implements OnClickListener {
 			}// switch
 		} // handleMessage
 	}; // handler
+	private String out;
 
 	private void initDevice() {
 		Log.e(TAG, "initDevice");
@@ -1680,6 +1933,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			sprinkler_flag = true;
 			windowsopener_flag = true;
+			// sprinkler_int_flag = 1;
+			// windowopener_int_flag = 1;
 
 		} else {
 			smog_tv.setText("연기가 감지되지 않았습니다.");
@@ -1688,6 +1943,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
 			sprinkler_flag = false;
 			windowsopener_flag = false;
+			// sprinkler_int_flag = 0;
+			// windowopener_int_flag = 0;
 		}
 	}
 
@@ -1809,6 +2066,10 @@ public class MainActivity extends Activity implements OnClickListener {
 				android.R.drawable.ic_menu_search);
 		menu.add(0, MENU_ITEM_DISCONNECT, 0, getString(R.string.disconnect))
 				.setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		menu.add(0, MENU_IP_ADDRESS, 0, getString(R.string.ip_address))
+				.setIcon(android.R.drawable.ic_menu_help);
+		menu.add(0, MENU_ITEM_EXIT, 0, getString(R.string.exit)).setIcon(
+				R.drawable.exit);
 		return true;
 	}
 
@@ -1837,6 +2098,13 @@ public class MainActivity extends Activity implements OnClickListener {
 			// mTitle.setText(R.string.title_not_connected);
 			stopTimer();
 			return true;
+
+		case MENU_IP_ADDRESS:
+			Toast.makeText(getBaseContext(), tryGetIpAddress(),
+					Toast.LENGTH_SHORT).show();
+
+			return true;
+
 		case MENU_ITEM_EXIT:
 			if (mCmdSendService != null)
 				mCmdSendService.stop();
@@ -1923,11 +2191,6 @@ public class MainActivity extends Activity implements OnClickListener {
 				B2, MB, MC, MD);
 	}
 
-	static void printToTextView(String text) {
-
-		// tv_soc.setText(text);
-	}
-
 	private static String tryGetIpAddress() {
 		try {
 			for (Enumeration<NetworkInterface> en = NetworkInterface
@@ -1951,4 +2214,75 @@ public class MainActivity extends Activity implements OnClickListener {
 		} // for now eat exceptions
 		return null;
 	} // tryGetIpAddress()
+	
+	public class DoRead extends AsyncTask<String, Void, MjpegInputStream> {
+		String TAG = "MJPEG";
+		
+        protected MjpegInputStream doInBackground(String... url) {
+            //TODO: if camera has authentication deal with it and don't just not work
+            HttpResponse res = null;
+            DefaultHttpClient httpclient = new DefaultHttpClient(); 
+            HttpParams httpParams = httpclient.getParams();
+            HttpConnectionParams.setConnectionTimeout(httpParams, 5*1000);
+            Log.d(TAG, "1. Sending http request");
+            try {
+                res = httpclient.execute(new HttpGet(URI.create(url[0])));
+                Log.d(TAG, "2. Request finished, status = " + res.getStatusLine().getStatusCode());
+                if(res.getStatusLine().getStatusCode()==401){
+                    //You must turn off camera User Access Control before this will work
+                    return null;
+                }
+                return new MjpegInputStream(res.getEntity().getContent());  
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+                Log.d(TAG, "Request failed-ClientProtocolException", e);
+                //Error connecting to camera
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.d(TAG, "Request failed-IOException", e);
+                //Error connecting to camera
+            }
+            return null;
+        }
+
+        protected void onPostExecute(MjpegInputStream result) {
+            mv.setSource(result);
+            //if(result!=null) result.setSkip(1);
+            mv.setDisplayMode(MjpegView.SIZE_BEST_FIT);
+            mv.showFps(false);
+        }
+    }
+	
+	void shellCommand(String cmd) throws IOException {
+//        Runtime runtime = Runtime.getRuntime(); 
+//        Process process; 
+//        try { 
+//        		Log.w("shell",cmd);
+//
+//                process = runtime.exec(cmd); 
+//                BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream())); 
+//                String line ; 
+//                while ((line = br.readLine()) != null) { 
+//                	Log.w("shell",line);
+//                } 
+//
+//        } catch (Exception e) { 
+//                e.fillInStackTrace(); 
+//                Log.e("Process Manager", "Unable to execute top command"); 
+//        }
+
+        Process p = Runtime.getRuntime().exec("sh");
+        DataOutputStream os = new DataOutputStream(p.getOutputStream());
+        //from here all commands are executed with su permissions
+        os.writeBytes(cmd); // \n executes the command
+        os.writeBytes("exit\n");
+        os.flush();
+        //InputStream stdout = p.getInputStream();
+        //read method will wait forever if there is nothing in the stream
+        //so we need to read it in another way than while((read=stdout.read(buffer))>0)
+
+        
+        //do something with the output
+	
+	}
 }

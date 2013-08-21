@@ -27,6 +27,7 @@
     <string name="use_accelerometer">Use accelerometer</string>
     <string name="use_accelerometer_cancel">Stop use accelerometer</string>
     <string name="exit">Exit</string>
+    <string name="ip_address">IP address</string>
     <string name="speech">Speech</string>
     <string name="speech_cancel">Speech cancel</string>
     <string name="command_history">Command history</string>
@@ -60,7 +61,7 @@
     <string name="pressure">Pressure</string>
     <string name="pressure_alarm">Pressure alarm</string>
     <string name="pressure_max">Max pressure</string>
-    <string name="app_name">MyFarm</string>
+    <string name="app_name">MyFarm_Server</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_main">MainActivity</string>
