@@ -461,15 +461,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().permitNetwork().build()); 
 
 
-		try {
-			shellCommand("mjpg-streamer -i \"input_uvc.so -d /dev/video4\" -o \"output_http.so -p 9000\"\n");
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			Log.e("shell", "Camera On Failed");
-			Toast.makeText(this, "Camera on failed", Toast.LENGTH_SHORT).show();
-		}
-		//shellCommand("ls");
+
 
 		/*********************************************/
 
@@ -2253,36 +2245,4 @@ public class MainActivity extends Activity implements OnClickListener {
         }
     }
 	
-	void shellCommand(String cmd) throws IOException {
-//        Runtime runtime = Runtime.getRuntime(); 
-//        Process process; 
-//        try { 
-//        		Log.w("shell",cmd);
-//
-//                process = runtime.exec(cmd); 
-//                BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream())); 
-//                String line ; 
-//                while ((line = br.readLine()) != null) { 
-//                	Log.w("shell",line);
-//                } 
-//
-//        } catch (Exception e) { 
-//                e.fillInStackTrace(); 
-//                Log.e("Process Manager", "Unable to execute top command"); 
-//        }
-
-        Process p = Runtime.getRuntime().exec("sh");
-        DataOutputStream os = new DataOutputStream(p.getOutputStream());
-        //from here all commands are executed with su permissions
-        os.writeBytes(cmd); // \n executes the command
-        os.writeBytes("exit\n");
-        os.flush();
-        //InputStream stdout = p.getInputStream();
-        //read method will wait forever if there is nothing in the stream
-        //so we need to read it in another way than while((read=stdout.read(buffer))>0)
-
-        
-        //do something with the output
-	
-	}
 }
